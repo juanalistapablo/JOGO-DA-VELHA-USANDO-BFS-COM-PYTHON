@@ -8,6 +8,7 @@ LINE_COLOR = (0, 0, 0)
 BG_COLOR = (255, 255, 255)
 O_COLOR = (0, 0, 255)
 X_COLOR = (255, 0, 0)
+TEXT_COLOR = (0, 0, 0)
 CELL_SIZE = WIDTH // 3
 LINE_WIDTH = 5
 FPS = 30
@@ -17,6 +18,7 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Jogo da Velha com BFS")
 clock = pygame.time.Clock()
+font = pygame.font.SysFont(None, 48)  # Fonte para mensagens
 
 # Função para desenhar o tabuleiro
 def draw_board():
@@ -81,6 +83,14 @@ def bfs_best_move(board, player):
                     queue.append((new_board, path + [(row, col)]))
     return None
 
+# Função para exibir mensagens finais
+def show_message(message):
+    text_surface = font.render(message, True, TEXT_COLOR)
+    text_rect = text_surface.get_rect(center=(WIDTH//2, HEIGHT//2))
+    screen.blit(text_surface, text_rect)
+    pygame.display.flip()
+    pygame.time.wait(2000)  # Espera 2 segundos antes de fechar
+
 # Função principal
 def main():
     board = [['' for _ in range(3)] for _ in range(3)]
@@ -105,8 +115,10 @@ def main():
                 if board[row][col] == '':
                     board[row][col] = 'X'
                     if check_winner(board, 'X'):
-                        print("Jogador X venceu!")
-                        pygame.time.wait(2000)
+                        draw_board()
+                        draw_symbols(board)
+                        pygame.display.flip()
+                        show_message("Você ganhou!")
                         pygame.quit()
                         sys.exit()
                     player_turn = False
@@ -118,21 +130,25 @@ def main():
                 row, col = move
                 board[row][col] = 'O'
                 if check_winner(board, 'O'):
-                    print("Computador O venceu!")
-                    pygame.time.wait(2000)
+                    draw_board()
+                    draw_symbols(board)
+                    pygame.display.flip()
+                    show_message("Você perdeu!")
                     pygame.quit()
                     sys.exit()
             player_turn = True
 
         # Verifica empate
         if all(all(cell != '' for cell in row) for row in board):
-            print("Empate!")
-            pygame.time.wait(2000)
+            draw_board()
+            draw_symbols(board)
+            pygame.display.flip()
+            show_message("Empate!")
             pygame.quit()
             sys.exit()
 
         clock.tick(FPS)
 
 # Executa o jogo
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
